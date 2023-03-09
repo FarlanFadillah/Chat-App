@@ -1,0 +1,30 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login Form</title>
+    <link rel="stylesheet" href="{% static 'login.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <form action="checkview" method="post">
+            {% csrf_token %}
+            <h2>Enter the Room</h2>
+            <div class="inputBox">
+                <input type="text" name="room" required placeholder="">
+                <label>Room</label>
+            </div>
+            <div class="inputBox">
+                <input type="text" name="username" required placeholder="">
+                <label>Name</label>
+            </div>
+            <input type="submit" value="Login">
+        </form>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,111 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <title>Chat App</title>
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <h1 class="room_name">{{room}} - {{username}} - Room Id : {{room_details.id}}</h1>
+    <div class="chat-box">
+        <div class="chat-history" id="display">
+
+        </div>
+        <form id="my-form">
+            {% csrf_token %}
+            <input hidden type="text" placeholder="" value="{{username}}" id="username">
+            <input hidden type="text" placeholder="" value="{{room_details.id}}" id="room_id">
+            <div class="chat-input">
+                <input id="message" class="type_text" type="text" placeholder="Ketik pesan di sini...">
+                <button class="send_button" type="submit">Kirim</button>
+            </div>
+        </form>
+    </div>
+    <script>
+
+        $(document).ready(function () {
+            i = 0
+            message_count = 0
+            x = 0
+            var room_name = ''
+            if ('{{room}}'.length != 11) {
+                room_name = '{{room}}'
+            }
+            console.log(room_name)
+            setInterval(function () {
+                $.ajax({
+                    type: 'GET',
+                    url: "/getMessages/" + room_name,
+                    success: function (response) {
+                        
+                        $("#display").empty();
+                        
+                        for (var key in response.messages) {
+                            if (response.messages[key].username == "{{username}}") {
+                                var temp = "<div class='message message-incoming'><div class='name'><b>" + response.messages[key].username + "</b></div><div class='message-text'>" + response.messages[key].message + "</div><div class='message-time'>" + response.messages[key].date + "</div></div>";
+                                $("#display").append(temp);
+
+                            } else {
+                                var temp = "<div class='message'><div class='name'><b>" + response.messages[key].username + "</b></div><div class='message-text'>" + response.messages[key].message + "</div><div class='message-time'>" + response.messages[key].date + "</div></div>";
+                                $("#display").append(temp);
+                               
+                            }
+                            x = key
+                        }
+
+                        if (i == 0) {
+                            var elem = document.querySelector('.chat-history');
+                            elem.scrollTo(0, elem.scrollHeight);
+                            i++
+                        }
+                        if(message_count == 0){
+                            message_count = x
+                            x = 0
+                        }else if(message_count < x){
+                            var elem = document.querySelector('.chat-history');
+                            elem.scrollTo(0, elem.scrollHeight);
+                            message_count = x
+                            x=0
+                        }else{
+                            x = 0
+                        }
+                    },
+                    error: function (response) {
+                        // alert('An error occured')
+                    }
+                });
+            }, 1000);
+        })
+    </script>
+    <script type="text/javascript">
+        $(document).on('submit', '#my-form', function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '/send',
+                data: {
+                    username: $('#username').val(),
+                    room_id: $('#room_id').val(),
+                    message: $('#message').val(),
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                },
+                success: function (data) {
+                    //alert(data)
+                }
+            });
+            document.getElementById('message').value = ''
+        });
+    </script>
+
+</body>
+
+</html>
