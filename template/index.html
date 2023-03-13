@@ -18,7 +18,11 @@
     <h1 class="room_name">{{room}} - {{username}} - Room Id : {{room_details.id}}</h1>
     <div class="chat-box">
         <div class="chat-history" id="display">
-
+            <!-- <div class='message message-incoming'>
+                <div class='name'><b></b></div>
+                <div class='message-text'></div>
+                <div class='message-time'></div>
+            </div> -->
         </div>
         <form id="my-form">
             {% csrf_token %}
@@ -46,9 +50,9 @@
                     type: 'GET',
                     url: "/getMessages/" + room_name,
                     success: function (response) {
-                        
+
                         $("#display").empty();
-                        
+
                         for (var key in response.messages) {
                             if (response.messages[key].username == "{{username}}") {
                                 var temp = "<div class='message message-incoming'><div class='name'><b>" + response.messages[key].username + "</b></div><div class='message-text'>" + response.messages[key].message + "</div><div class='message-time'>" + response.messages[key].date + "</div></div>";
@@ -57,7 +61,7 @@
                             } else {
                                 var temp = "<div class='message'><div class='name'><b>" + response.messages[key].username + "</b></div><div class='message-text'>" + response.messages[key].message + "</div><div class='message-time'>" + response.messages[key].date + "</div></div>";
                                 $("#display").append(temp);
-                               
+
                             }
                             x = key
                         }
@@ -67,15 +71,15 @@
                             elem.scrollTo(0, elem.scrollHeight);
                             i++
                         }
-                        if(message_count == 0){
+                        if (message_count == 0) {
                             message_count = x
                             x = 0
-                        }else if(message_count < x){
+                        } else if (message_count < x) {
                             var elem = document.querySelector('.chat-history');
                             elem.scrollTo(0, elem.scrollHeight);
                             message_count = x
-                            x=0
-                        }else{
+                            x = 0
+                        } else {
                             x = 0
                         }
                     },
